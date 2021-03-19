@@ -34,7 +34,7 @@ steps:
   displayName: 'Coverity Download'
 
 - bash: |
-    $COVERITY_TOOL_HOME/bin/cov-build --dir idir mvn clean compile -Drat.skip=true -DskipTests
+    $COVERITY_TOOL_HOME/bin/cov-build --dir idir 'mvn clean compile -Drat.skip=true -DskipTests > /dev/null'
     $COVERITY_TOOL_HOME/bin/cov-analyze --ticker-mode none --strip-path $(Build.SourcesDirectory) --dir idir --disable-fb --jobs auto
     $COVERITY_TOOL_HOME/bin/cov-format-errors --json-output-v8 coverity-errors.json --dir idir
 
