@@ -45,4 +45,3 @@ steps:
   inputs:
     targetPath: '$(Build.SourcesDirectory)/coverity-errors.sarif'
     artifact: 'CodeAnalysisLogs'
-    publishLocation: 'pipeline'
