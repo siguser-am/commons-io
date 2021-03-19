@@ -38,10 +38,11 @@ steps:
     $COVERITY_TOOL_HOME/bin/cov-analyze --ticker-mode none --strip-path $(Build.SourcesDirectory) --dir idir --disable-fb --jobs auto
     $COVERITY_TOOL_HOME/bin/cov-format-errors --json-output-v8 coverity-errors.SARIF --dir idir
 
-    cat coverity-errors.SARIF
+    pwd
+    echo Build Directory: $(Agent.BuildDirectory)
 
 - task: PublishPipelineArtifact@1
   inputs:
-    targetPath: '$(Pipeline.Workspace)/coverity-errors.SARIF'
+    targetPath: '$(Agent.BuildDirectory)/coverity-errors.SARIF'
     artifact: 'CodeAnalysisLogs'
     publishLocation: 'pipeline'
