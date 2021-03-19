@@ -39,10 +39,11 @@ steps:
     $COVERITY_TOOL_HOME/bin/cov-format-errors --json-output-v8 coverity-errors.SARIF --dir idir
 
     pwd
-    echo Build Directory: $(Agent.BuildDirectory)
+    ls
+    echo Build Directory: $(Build.SourcesDirectory)
 
 - task: PublishPipelineArtifact@1
   inputs:
-    targetPath: '$(Agent.BuildDirectory)/coverity-errors.SARIF'
+    targetPath: '$(Build.SourcesDirectory)/coverity-errors.SARIF'
     artifact: 'CodeAnalysisLogs'
     publishLocation: 'pipeline'
