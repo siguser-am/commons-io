@@ -13,10 +13,41 @@ variables:
 - group: coverity-azure
 
 steps:
+    - task: Bash@3
+      displayName: 'Coverity Download'
+      inputs:
+        targetType: inline
+        script: |
+          CSA=cov-analysis-linux64-2021.03
+          set -x
+          cd $(Agent.BuildDirectory)
+          curl -kfLsS --user $(COV_USER):$(COVERITY_PASSPHRASE) $(COV_URL)/downloadFile.htm?fn=$CSA.tar.gz | tar -xzf -
+          curl -kfLsS --user $(COV_USER):$(COVERITY_PASSPHRASE) -o license.dat $(COV_URL)/downloadFile.htm?fn=license.dat
+          mv license.dat $CSA/bin
+          COVERITY_TOOL_HOME="$(Agent.BuildDirectory)/$CSA"
+          echo "##vso[task.setvariable variable=COVERITY_TOOL_HOME]$COVERITY_TOOL_HOME"
+          $COVERITY_TOOL_HOME/bin/cov-configure --java
+    - task: Bash@3
+      inputs:
+        targetType: inline
+        script: |
+          $COVERITY_TOOL_HOME/bin/cov-build --dir idir mvn clean compile -Drat.skip=true -DskipTests
+          $COVERITY_TOOL_HOME/bin/cov-analyze --ticker-mode none --disable-fb --dir idir
+          $COVERITY_TOOL_HOME/bin/cov-analyze --dir idir --disable-fb --jobs auto --strip-path=$(Build.SourcesDirectory) --ticker-mode none
+          $COVERITY_TOOL_HOME/bin/cov-format-errors --json-output-v8 coverity-errors.json --dir idir
 
-- task: PublishBuildArtifacts@1
-  displayName: "Publish analysis logs"
-  inputs:
-    PathtoPublish: "$(Build.SourcesDirectory)"
-    ArtifactName: "CodeAnalysisLogs"
-    publishLocation: "Container"
+          $COVERITY_TOOL_HOME/node/bin/node $COVERITY_TOOL_HOME/SARIF/cov-format-sarif-for-github.js --inputFile coverity-errors.json --outputFile coverity-errors.sarif --githubUrl https://github.com --repoName $(Build.Repository.Name) --checkoutPath $(Build.Repository.Name) $(Build.SourcesDirectory) $(Build.SourceVersion)
+
+    - task: PublishBuildArtifacts@1
+      displayName: "Publish analysis logs"
+      inputs:
+        PathtoPublish: "$(Build.SourcesDirectory)/coverity-errors.sarif"
+        ArtifactName: "CodeAnalysisLogs"
+        publishLocation: "Container" 
+        
+    - task: PublishBuildArtifacts@1
+      displayName: "Publish sample sarif log"
+      inputs:
+        PathtoPublish: "$(Build.SourcesDirectory)/node.sarif"
+        ArtifactName: "CodeAnalysisLogs"
+        publishLocation: "Container"
