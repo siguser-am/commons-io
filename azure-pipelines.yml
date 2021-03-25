@@ -17,6 +17,6 @@ steps:
 - task: PublishBuildArtifacts@1
   displayName: "Publish analysis logs"
   inputs:
-    PathtoPublish: "$(Build.SourcesDirectory)/ResultStacks.sarif"
+    PathtoPublish: "$(Build.SourcesDirectory)/*.sarif"
     ArtifactName: "CodeAnalysisLogs"
     publishLocation: "Container"
