@@ -14,7 +14,9 @@ variables:
 
 steps:
 
-- task: PublishPipelineArtifact@1
+- task: PublishBuildArtifacts@1
+  displayName: "Publish analysis logs"
   inputs:
-    targetPath: '$(Build.SourcesDirectory)/ResultStacks.sarif'
-    artifact: 'CodeAnalysisLogs'
+    PathtoPublish: "$(Build.SourcesDirectory)/ResultStacks.sarif"
+    ArtifactName: "CodeAnalysisLogs"
+    publishLocation: "Container"
