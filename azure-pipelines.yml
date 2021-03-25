@@ -48,6 +48,6 @@ steps:
     - task: PublishBuildArtifacts@1
       displayName: "Publish sample sarif log"
       inputs:
-        PathtoPublish: "$(Build.SourcesDirectory)/node.sarif"
+        PathtoPublish: "$(Build.SourcesDirectory)/sarif/"
         ArtifactName: "CodeAnalysisLogs"
         publishLocation: "Container"
